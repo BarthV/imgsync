@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/barthv/imgsync/internal/config"
+	"github.com/barthv/imgsync/internal/repo"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -18,14 +19,20 @@ func runSync() error {
 	}
 
 	for _, source := range conf.Sources {
-		log.Infof("Starting repo sync %s", source.Source.Repository)
+		log.Infof("Starting repo sync for %s", source.Source.Repository)
 
 		repoAddr := source.Source.GetRepositoryAddress()
-		log.Infoln(repoAddr)
-		// repoTags, err :=
-		// if err != nil {
-		// 	return err
-		// }
+		repoTags, err := repo.ListTags(repoAddr)
+		if err != nil {
+			return err
+		}
+
+		filteredTags, err := source.FilterTags(repoTags)
+		if err != nil {
+			return err
+		}
+		log.Infoln(filteredTags)
+
 	}
 
 	return nil

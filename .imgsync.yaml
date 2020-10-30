@@ -13,7 +13,7 @@ sources:
   # tags:
   # - 1.0.0
   regexTags:
-  - "v.+"
+  - "^v.+"
   # tags:
   # - 1.1.0
   # - 1.2.0
@@ -24,6 +24,7 @@ sources:
   # latestSemverRegex: "..."
   tags:
   - 2.2.0
+  - 2.2.0-arm64
   # regexTags:
   # - ".+"
   # tags:

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"gopkg.in/yaml.v2"
@@ -39,9 +40,9 @@ type Source struct {
 	Source            Repo     `yaml:"source"`
 	Tags              []string `yaml:"tags,omitempty"`
 	MutableTags       []string `yaml:"mutableTags,omitempty"`
-	regexTags         []string `yaml:"regexTags,omitempty"`
-	syncLatestSemver  bool     `yaml:"syncLatestSemver,omitempty"`
-	latestSemverRegex string   `yaml:"latestSemverRegex,omitempty"`
+	RegexTags         []string `yaml:"regexTags,omitempty"`
+	SyncLatestSemver  bool     `yaml:"syncLatestSemver,omitempty"`
+	LatestSemverRegex string   `yaml:"latestSemverRegex,omitempty"`
 }
 
 func getConfigLocation(path string) string {
@@ -93,4 +94,56 @@ func (t *Repo) GetRepositoryAddress() string {
 	}
 
 	return repoPath
+}
+
+func stringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
+}
+
+func (s *Source) matchingTags(tags []string) []string {
+	matchingTags := []string{}
+	for _, t := range tags {
+		if stringInSlice(t, s.Tags) {
+			matchingTags = append(matchingTags, t)
+		}
+	}
+	return matchingTags
+}
+
+func (s *Source) matchingRegexTags(tags []string) ([]string, error) {
+	matchingRegexTags := []string{}
+	for _, t := range tags {
+		for _, r := range s.RegexTags {
+			match, err := regexp.MatchString(r, t)
+			if err != nil {
+				return []string{}, fmt.Errorf("Matching regexp \"%s\" %v", r, err)
+			}
+			if match {
+				matchingRegexTags = append(matchingRegexTags, t)
+				break
+			}
+		}
+	}
+	return matchingRegexTags, nil
+}
+
+// FilterTags compute filtering rules of a source and
+// applies it against a list of tags.
+func (s *Source) FilterTags(tags []string) ([]string, error) {
+	filteredTags := []string{}
+
+	filteredTags = append(filteredTags, s.matchingTags(tags)...)
+
+	matchingRegexTags, err := s.matchingRegexTags(tags)
+	if err != nil {
+		return []string{}, err
+	}
+	filteredTags = append(filteredTags, matchingRegexTags...)
+
+	return filteredTags, nil
 }
