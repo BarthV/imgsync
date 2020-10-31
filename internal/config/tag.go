@@ -39,10 +39,15 @@ func (s *Source) matchingRegexTags(tags []string) ([]string, error) {
 	matchingRegexTags := []string{}
 	for _, t := range tags {
 		for _, r := range s.RegexTags {
+			if r == "" {
+				continue
+			}
+
 			match, err := regexp.MatchString(r, t)
 			if err != nil {
 				return []string{}, fmt.Errorf("Matching regexp \"%s\" %v", r, err)
 			}
+
 			if match {
 				matchingRegexTags = append(matchingRegexTags, t)
 				break
