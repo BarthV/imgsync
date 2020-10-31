@@ -8,7 +8,7 @@ sources:
 - source:
     repository: barthv/coreos-flannel-multiarch
     host: docker.io
-  syncLatestSemver: true
+  # syncLatestSemver: true
   # latestSemverRegex: "..."
   # tags:
   # - 1.0.0
@@ -20,26 +20,9 @@ sources:
 - source:
     repository: barthv/uhubctl
     host: docker.io
-  # syncLatestSemver: true
-  # latestSemverRegex: "..."
   tags:
   - 2.2.0
   - 2.2.0-arm64
-  # regexTags:
-  # - ".+"
-  # tags:
-  # - 1.1.0
-  # - 1.2.0
 - source:
-    repository: barthv/bitnami-fluentd-amqp
-    host: docker.io
-  # syncLatestSemver: true
-  # latestSemverRegex: "..."
-  tags:
-  - 1.11.2-debian-10-r8
-  # regexTags:
-  # - "v*"
-  # tags:
-  # - 1.1.0
-  # - 1.2.0
-  
+    repository: nginx
+  syncLatestSemver: true
