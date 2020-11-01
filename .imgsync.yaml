@@ -19,7 +19,6 @@ sources:
   # - 1.2.0
 - source:
     repository: barthv/uhubctl
-    host: docker.io
   tags:
   - 2.2.0
   - 2.2.0-arm64
