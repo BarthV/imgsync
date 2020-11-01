@@ -69,14 +69,14 @@ func Get(path string) (Config, error) {
 	return config, nil
 }
 
-func hostSupportsNestedRepositories(host string) bool {
+func (r *Repo) supportNestedRepositories() bool {
 	// Quay.io
-	if strings.Contains(host, "quay.io") {
+	if strings.Contains(r.Host, "quay.io") {
 		return false
 	}
 	// Docker Registry (Docker Hub)
 	// An empty host is assumed to be Docker Hub.
-	if strings.Contains(host, "docker.io") || host == "" {
+	if strings.Contains(r.Host, "docker.io") || r.Host == "" {
 		return false
 	}
 	return true
@@ -98,7 +98,7 @@ func (r *Repo) GetRepositoryAddress() string {
 func (s *Source) GetTargetRepositoryAddress(targetRepo Repo) string {
 	var target string
 
-	if hostSupportsNestedRepositories(targetRepo.Host) {
+	if targetRepo.supportNestedRepositories() {
 		target = "/" + s.Source.Repository
 	} else {
 		target = "/" + filepath.Base(s.Source.Repository)
