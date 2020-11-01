@@ -22,7 +22,7 @@ func runSync() error {
 	log.Infof("Images will be synced to %s", targetAddr)
 
 	for _, source := range conf.Sources {
-		log.Infof("Starting repo sync for %s", source.Source.Repository)
+		log.Infof("Starting %s repo sync", source.Source.Repository)
 
 		sourceRepoAddr := source.Source.GetRepositoryAddress()
 		sourceRepoTags, err := repo.ListTags(sourceRepoAddr)
@@ -38,18 +38,28 @@ func runSync() error {
 		log.Infof("%s : %d tags matching provided rules", sourceRepoAddr, len(sourceFilteredTags))
 
 		targetRepoAddr := source.GetTargetRepositoryAddress(conf.Target)
-		log.Infof("Repository %s will be synced to %s", sourceRepoAddr, targetRepoAddr)
+		log.Infof("%s : target is %s", sourceRepoAddr, targetRepoAddr)
 
 		if err := conf.Target.Healthcheck(); err != nil {
 			return err
 		}
 
-		// targetRepoTags, _ := repo.ListTags(targetRepoAddr)
-		// tagsToSync :=
-		// tagsToUpdate :=
+		targetRepoTags, _ := repo.ListTags(targetRepoAddr)
+		missingTags := config.MissingTags(sourceFilteredTags, targetRepoTags)
+		allSyncTags := append(missingTags, source.MutableTags...)
+		if len(missingTags) > 0 {
+			log.Infof("%d tags needs to be synced", len(missingTags))
+		}
+		if len(source.MutableTags) > 0 {
+			log.Infof("%d tags will be forced", len(missingTags))
+		}
 
-		for _, tag := range sourceFilteredTags {
+		if len(allSyncTags) == 0 {
+			log.Infof("%s : target is up-to-date", sourceRepoAddr)
+			continue
+		}
 
+		for _, tag := range allSyncTags {
 			log.Infof("Syncing %s:%s to %s:%s", sourceRepoAddr, tag, targetRepoAddr, tag)
 			err = repo.SyncTags(tag, sourceRepoAddr, targetRepoAddr)
 			if err != nil {

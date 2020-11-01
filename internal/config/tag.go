@@ -150,3 +150,16 @@ func (s *Source) FilterTags(tags []string) ([]string, error) {
 
 	return filteredTags, nil
 }
+
+// MissingTags return the missing srcTags from dstList
+func MissingTags(srcTags []string, dstTags []string) []string {
+	missingTags := []string{}
+
+	for _, srcTag := range srcTags {
+		if !stringInSlice(srcTag, dstTags) {
+			missingTags = append(missingTags, srcTag)
+		}
+	}
+
+	return missingTags
+}
