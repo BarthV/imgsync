@@ -25,7 +25,7 @@ func runSync() error {
 		log.Infof("Starting %s repo sync", source.Source.Repository)
 
 		sourceRepoAddr := source.Source.GetRepositoryAddress()
-		sourceRepoTags, err := repo.ListTags(sourceRepoAddr)
+		sourceRepoTags, err := repo.ListRepo(sourceRepoAddr)
 		if err != nil {
 			return err
 		}
@@ -44,7 +44,7 @@ func runSync() error {
 			return err
 		}
 
-		targetRepoTags, _ := repo.ListTags(targetRepoAddr)
+		targetRepoTags, _ := repo.ListRepo(targetRepoAddr)
 		missingTags := config.MissingTags(sourceFilteredTags, targetRepoTags)
 		allSyncTags := append(missingTags, source.MutableTags...)
 		if len(missingTags) > 0 {
@@ -61,7 +61,7 @@ func runSync() error {
 
 		for _, tag := range allSyncTags {
 			log.Infof("Syncing %s:%s to %s:%s", sourceRepoAddr, tag, targetRepoAddr, tag)
-			err = repo.SyncTags(tag, sourceRepoAddr, targetRepoAddr)
+			err = repo.SyncTagBetweenRepos(tag, sourceRepoAddr, targetRepoAddr)
 			if err != nil {
 				return err
 			}
