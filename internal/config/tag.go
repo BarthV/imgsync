@@ -61,6 +61,9 @@ func getHighestSemverTag(semvers []string) (string, error) {
 	versions := semver.Collection{}
 
 	for _, sv := range semvers {
+		if sv == "" {
+			continue
+		}
 		v, err := semver.NewVersion(sv)
 		if err != nil {
 			return "", fmt.Errorf("Semver parsing error %s : %v", sv, err)
@@ -68,12 +71,16 @@ func getHighestSemverTag(semvers []string) (string, error) {
 		versions = append(versions, v)
 	}
 
-	// semver sorting is provided by semver dependency package.
-	// I hope it's ok :)
-	sort.Sort(semver.Collection(versions))
-	highestSemver := versions[len(versions)-1].String()
+	if len(versions) > 0 {
+		// semver sorting is provided by semver dependency package.
+		// I hope it's ok :)
+		sort.Sort(semver.Collection(versions))
+		highestSemver := versions[len(versions)-1].String()
 
-	return highestSemver, nil
+		return highestSemver, nil
+	}
+
+	return "", nil
 }
 
 func getSemverTags(tags []string, regex string) ([]string, error) {

@@ -25,7 +25,7 @@ func TestGetConfigLocation(t *testing.T) {
 		t.Run(testname, func(t *testing.T) {
 			ans := getConfigLocation(test.location)
 			if ans != test.want {
-				t.Errorf("got %s, want %s", ans, test.want)
+				t.Errorf("got '%s', want '%s'", ans, test.want)
 			}
 		})
 	}
@@ -72,7 +72,7 @@ func TestGetRepositoryAddress(t *testing.T) {
 		t.Run(testname, func(t *testing.T) {
 			ans := test.repo.GetRepositoryAddress()
 			if ans != test.want {
-				t.Errorf("got %s, want %s", ans, test.want)
+				t.Errorf("got '%s', want '%s'", ans, test.want)
 			}
 		})
 	}

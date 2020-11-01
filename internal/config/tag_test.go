@@ -33,7 +33,7 @@ func TestMatchingTags(t *testing.T) {
 		t.Run(testname, func(t *testing.T) {
 			ans := testSource.matchingTags(test.tags)
 			if !reflect.DeepEqual(ans, test.want) {
-				t.Errorf("got %v, want %v", ans, test.want)
+				t.Errorf("got '%s', want '%s'", ans, test.want)
 			}
 		})
 	}
@@ -79,9 +79,36 @@ func TestMatchingRegexTags(t *testing.T) {
 				t.Errorf("got unexpected error %v", err)
 			}
 			if !reflect.DeepEqual(ans, test.want) {
-				t.Errorf("got %v, want %v", ans, test.want)
+				t.Errorf("got '%s', want '%s'", ans, test.want)
 			}
 		})
 	}
 
+}
+
+func TestGetHighestSemverTag(t *testing.T) {
+	var tests = []struct {
+		semvers   []string
+		want      string
+		wantError bool
+	}{
+		{[]string{}, "", false},
+		{[]string{""}, "", false},
+		{[]string{"1.0.0", "2.0.1", "1.1.0"}, "2.0.1", false},
+		{[]string{"v1.0.1"}, "1.0.1", true},
+		{[]string{"1.32-glibc", "1.32-musl", "1.32-uclibc", "1.32.0-glibc", "1.32.0-musl", "1.32.0-uclibc", "1.32.0", "1.32", "1"}, "1.32.0", false},
+	}
+
+	for _, test := range tests {
+		testname := fmt.Sprintf("getHighestSemverTag %v", test.want)
+		t.Run(testname, func(t *testing.T) {
+			ans, err := getHighestSemverTag(test.semvers)
+			if err != nil && !test.wantError {
+				t.Errorf("got unexpected error %v", err)
+			}
+			if !reflect.DeepEqual(ans, test.want) {
+				t.Errorf("got '%s', want '%s'", ans, test.want)
+			}
+		})
+	}
 }

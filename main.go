@@ -45,7 +45,8 @@ func runSync() error {
 		}
 
 		// targetRepoTags, _ := repo.ListTags(targetRepoAddr)
-		// log.Infoln(targetRepoTags)
+		// tagsToSync :=
+		// tagsToUpdate :=
 
 		for _, tag := range sourceFilteredTags {
 
