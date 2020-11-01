@@ -26,3 +26,5 @@ sources:
 - source:
     repository: nginx
   syncLatestSemver: true
+  mutableTags:
+  - latest
