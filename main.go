@@ -18,21 +18,27 @@ func runSync() error {
 		return err
 	}
 
+	targetAddr := conf.Target.GetRepositoryAddress()
+	log.Infof("Images will be synced to %s", targetAddr)
+
 	for _, source := range conf.Sources {
 		log.Infof("Starting repo sync for %s", source.Source.Repository)
 
-		repoAddr := source.Source.GetRepositoryAddress()
-		repoTags, err := repo.ListTags(repoAddr)
+		sourceRepoAddr := source.Source.GetRepositoryAddress()
+		sourceRepoTags, err := repo.ListTags(sourceRepoAddr)
 		if err != nil {
 			return err
 		}
+		log.Infof("%s : %d tags discovered", sourceRepoAddr, len(sourceRepoTags))
 
-		filteredTags, err := source.FilterTags(repoTags)
+		sourceFilteredTags, err := source.FilterTags(sourceRepoTags)
 		if err != nil {
 			return err
 		}
-		log.Infoln(filteredTags)
+		log.Infof("%s : %d tags matching provided rules", sourceRepoAddr, len(sourceFilteredTags))
 
+		targetRepoAddr := source.GetTargetRepositoryAddress(conf.Target)
+		log.Infof("Source image %s will be synced to %s", sourceRepoAddr, targetRepoAddr)
 	}
 
 	return nil

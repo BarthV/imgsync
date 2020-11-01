@@ -74,23 +74,37 @@ func hostSupportsNestedRepositories(host string) bool {
 	if strings.Contains(host, "quay.io") {
 		return false
 	}
-
 	// Docker Registry (Docker Hub)
 	// An empty host is assumed to be Docker Hub.
 	if strings.Contains(host, "docker.io") || host == "" {
 		return false
 	}
-
 	return true
 }
 
 // GetRepositoryAddress returns a full repository path.
-func (t *Repo) GetRepositoryAddress() string {
-	repoPath := "index.docker.io/" + t.Repository
+func (r *Repo) GetRepositoryAddress() string {
+	repoPath := "index.docker.io/" + r.Repository
 
-	if t.Host != "" {
-		repoPath = t.Host + "/" + t.Repository
+	if r.Host != "" {
+		repoPath = r.Host + "/" + r.Repository
 	}
 
 	return repoPath
+}
+
+// GetTargetRepositoryAddress compute the final target repo adress
+// from a source repo with nested repo support if handled by target.
+func (s *Source) GetTargetRepositoryAddress(targetRepo Repo) string {
+	var target string
+
+	if hostSupportsNestedRepositories(targetRepo.Host) {
+		target = "/" + s.Source.Repository
+	} else {
+		target = "/" + filepath.Base(s.Source.Repository)
+	}
+
+	target = targetRepo.GetRepositoryAddress() + target
+
+	return target
 }
