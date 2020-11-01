@@ -38,7 +38,24 @@ func runSync() error {
 		log.Infof("%s : %d tags matching provided rules", sourceRepoAddr, len(sourceFilteredTags))
 
 		targetRepoAddr := source.GetTargetRepositoryAddress(conf.Target)
-		log.Infof("Source image %s will be synced to %s", sourceRepoAddr, targetRepoAddr)
+		log.Infof("Repository %s will be synced to %s", sourceRepoAddr, targetRepoAddr)
+
+		if err := conf.Target.Healthcheck(); err != nil {
+			return err
+		}
+
+		// targetRepoTags, _ := repo.ListTags(targetRepoAddr)
+		// log.Infoln(targetRepoTags)
+
+		for _, tag := range sourceFilteredTags {
+
+			log.Infof("Syncing %s:%s to %s:%s", sourceRepoAddr, tag, targetRepoAddr, tag)
+			err = repo.SyncTags(tag, sourceRepoAddr, targetRepoAddr)
+			if err != nil {
+				return err
+			}
+		}
+
 	}
 
 	return nil

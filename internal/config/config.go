@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"path/filepath"
 	"strings"
 
@@ -29,6 +30,7 @@ type Auth struct {
 // the configuration will be pushed to.
 type Repo struct {
 	Repository string `yaml:"repository"`
+	Scheme     string `yaml:"scheme:omitempty"`
 	Host       string `yaml:"host,omitempty"`
 	Auth       Auth   `yaml:"auth,omitempty"`
 }
@@ -99,12 +101,36 @@ func (s *Source) GetTargetRepositoryAddress(targetRepo Repo) string {
 	var target string
 
 	if targetRepo.supportNestedRepositories() {
-		target = "/" + s.Source.Repository
+		target = s.Source.Repository
 	} else {
-		target = "/" + filepath.Base(s.Source.Repository)
+		target = filepath.Base(s.Source.Repository)
 	}
 
 	target = targetRepo.GetRepositoryAddress() + target
 
 	return target
+}
+
+// Healthcheck tests "/v2" registry url availability.
+// 2xx and 401 response status codes are valid.
+func (r *Repo) Healthcheck() error {
+	repoHostURL := "https://index.docker.io/"
+
+	if r.Host != "" {
+		repoHostURL = r.Host
+		if r.Scheme != "" {
+			repoHostURL = r.Scheme + "://" + repoHostURL
+		} else {
+			repoHostURL = "http://" + repoHostURL
+		}
+	}
+
+	httpRes, err := http.Get(repoHostURL)
+	if err != nil {
+		return err
+	}
+	if (httpRes.StatusCode >= 200 && httpRes.StatusCode <= 299) || httpRes.StatusCode == 401 {
+		return nil
+	}
+	return fmt.Errorf("Repo host healthcheck: %s status code %d must be 2xx or 401", repoHostURL, httpRes.StatusCode)
 }
