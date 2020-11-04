@@ -38,12 +38,14 @@ type Repo struct {
 // Source is a container repo in the manifest. Synced tags can be
 // selected with multiple options and strategies
 type Source struct {
-	Source            Repo     `yaml:"source"`
-	Tags              []string `yaml:"tags,omitempty"`
-	MutableTags       []string `yaml:"mutableTags,omitempty"`
-	RegexTags         []string `yaml:"regexTags,omitempty"`
-	SyncLatestSemver  bool     `yaml:"syncLatestSemver,omitempty"`
-	LatestSemverRegex string   `yaml:"latestSemverRegex,omitempty"`
+	Source             Repo     `yaml:"source"`
+	Tags               []string `yaml:"tags,omitempty"`
+	MutableTags        []string `yaml:"mutableTags,omitempty"`
+	RegexTags          []string `yaml:"regexTags,omitempty"`
+	SyncLatestSemver   bool     `yaml:"syncLatestSemver,omitempty"`
+	LatestSemverRegex  string   `yaml:"latestSemverRegex,omitempty"`
+	OmitPreReleaseTags bool     `yaml:"omitPreReleaseTags,omitempty"`
+	OmitDashedTags     bool     `yaml:"omitDashedTags,omitempty"`
 }
 
 func getConfigLocation(path string) string {

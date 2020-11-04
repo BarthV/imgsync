@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	"sort"
+	"strings"
 
 	"github.com/Masterminds/semver"
 )
@@ -16,6 +17,15 @@ const (
 func stringInSlice(a string, list []string) bool {
 	for _, b := range list {
 		if b == a {
+			return true
+		}
+	}
+	return false
+}
+
+func containsSubstring(items []string, substring string) bool {
+	for _, item := range items {
+		if strings.Contains(substring, item) {
 			return true
 		}
 	}
@@ -45,7 +55,7 @@ func (s *Source) matchingRegexTags(tags []string) ([]string, error) {
 
 			match, err := regexp.MatchString(r, t)
 			if err != nil {
-				return []string{}, fmt.Errorf("Matching regexp \"%s\" %v", r, err)
+				return []string{}, fmt.Errorf("Matching regexp \"%s\" %w", r, err)
 			}
 
 			if match {
@@ -66,7 +76,7 @@ func getHighestSemverTag(semvers []string) (string, error) {
 		}
 		v, err := semver.NewVersion(sv)
 		if err != nil {
-			return "", fmt.Errorf("Semver parsing error %s : %v", sv, err)
+			return "", fmt.Errorf("Semver parsing error %s : %w", sv, err)
 		}
 		versions = append(versions, v)
 	}
@@ -89,7 +99,7 @@ func getSemverTags(tags []string, regex string) ([]string, error) {
 	for _, t := range tags {
 		match, err := regexp.MatchString(regex, t)
 		if err != nil {
-			return []string{}, fmt.Errorf("Matching semver regexp %v", err)
+			return []string{}, fmt.Errorf("Matching semver regexp %w", err)
 		}
 		if match {
 			semverTags = append(semverTags, t)
@@ -117,10 +127,37 @@ func (s *Source) matchingLatestSemverTag(tags []string) (string, error) {
 	// ... then sort them out to keep to bigger one !
 	latestSemverTag, err = getHighestSemverTag(semverTags)
 	if err != nil {
-		return "", fmt.Errorf("finding highest semver %v", err)
+		return "", fmt.Errorf("finding highest semver %w", err)
 	}
 
 	return latestSemverTag, nil
+}
+
+func (s *Source) filterSpecialTags(tags []string) []string {
+	if !s.OmitPreReleaseTags && !s.OmitDashedTags {
+		return tags
+	}
+
+	var filteredSpecialTags []string
+	for _, tag := range tags {
+		// Remove tags that include prerelease related tags
+		if s.OmitPreReleaseTags {
+			allowedPreReleases := []string{"alpha", "beta", "rc"}
+			if containsSubstring(allowedPreReleases, tag) {
+				continue
+			}
+		}
+
+		// Remove tags that include dash (special arch, custom builds, ...)
+		if s.OmitDashedTags {
+			if strings.Contains(tag, "-") {
+				continue
+			}
+		}
+
+		filteredSpecialTags = append(filteredSpecialTags, tag)
+	}
+	return filteredSpecialTags
 }
 
 // FilterTags compute filtering rules of a source and
@@ -139,7 +176,7 @@ func (s *Source) FilterTags(tags []string) ([]string, error) {
 	filteredTags = append(filteredTags, matchingRegexTags...)
 
 	// select the highest existing semver tag based on defaut
-	// regex or provided regex in "latestSemverRegex" config
+	// regex or provided regex in "latestSemverRegex" config.
 	latestSemverTag, err := s.matchingLatestSemverTag(tags)
 	if err != nil {
 		return []string{}, err
@@ -148,7 +185,9 @@ func (s *Source) FilterTags(tags []string) ([]string, error) {
 		filteredTags = append(filteredTags, latestSemverTag)
 	}
 
-	return filteredTags, nil
+	// remove omitted "special" tags if source specify this options.
+	finalTags := s.filterSpecialTags(filteredTags)
+	return finalTags, nil
 }
 
 // MissingTags return the missing srcTags from dstList

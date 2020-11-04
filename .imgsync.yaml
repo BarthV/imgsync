@@ -1,4 +1,7 @@
 ---
+# listTimeout: 20s
+# syncTagTimeout: 240s
+# continueOnSyncError: false
 target:
   # repository: test
   host: 127.0.0.1:5000
@@ -8,8 +11,10 @@ sources:
 - source:
     repository: barthv/coreos-flannel-multiarch
     host: docker.io
-  # syncLatestSemver: true
+  # syncLatestSemver: false
   # latestSemverRegex: "..."
+  # omitPreReleaseTags: false
+  # omitDashedTags: false
   # tags:
   # - 1.0.0
   regexTags:
@@ -19,11 +24,15 @@ sources:
   # - 1.2.0
 - source:
     repository: barthv/uhubctl
+  omitPreReleaseTags: true
   tags:
   - 2.2.0
   - 2.2.0-arm64
+  - 2.2.1rc1
 - source:
     repository: nginx
   syncLatestSemver: true
+  omitPreReleasesTags: true
+  omitDashedTags: true
   mutableTags:
   - latest
