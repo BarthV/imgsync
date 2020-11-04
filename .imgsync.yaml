@@ -11,7 +11,7 @@ sources:
 - source:
     repository: barthv/coreos-flannel-multiarch
     host: docker.io
-  # syncLatestSemver: false
+  # latestSemverSync: false
   # latestSemverRegex: "..."
   # omitPreReleaseTags: false
   # omitDashedTags: false
@@ -31,7 +31,7 @@ sources:
   - 2.2.1rc1
 - source:
     repository: nginx
-  syncLatestSemver: true
+  latestSemverSync: true
   omitPreReleasesTags: true
   omitDashedTags: true
   mutableTags:

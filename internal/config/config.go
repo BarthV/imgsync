@@ -42,7 +42,7 @@ type Source struct {
 	Tags               []string `yaml:"tags,omitempty"`
 	MutableTags        []string `yaml:"mutableTags,omitempty"`
 	RegexTags          []string `yaml:"regexTags,omitempty"`
-	SyncLatestSemver   bool     `yaml:"syncLatestSemver,omitempty"`
+	LatestSemverSync   bool     `yaml:"latestSemverSync,omitempty"`
 	LatestSemverRegex  string   `yaml:"latestSemverRegex,omitempty"`
 	OmitPreReleaseTags bool     `yaml:"omitPreReleaseTags,omitempty"`
 	OmitDashedTags     bool     `yaml:"omitDashedTags,omitempty"`

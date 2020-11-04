@@ -110,7 +110,7 @@ func getSemverTags(tags []string, regex string) ([]string, error) {
 }
 
 func (s *Source) matchingLatestSemverTag(tags []string) (string, error) {
-	if !(s.SyncLatestSemver) {
+	if !(s.LatestSemverSync) {
 		return "", nil
 	}
 
@@ -175,8 +175,8 @@ func (s *Source) FilterTags(tags []string) ([]string, error) {
 	}
 	filteredTags = append(filteredTags, matchingRegexTags...)
 
-	// select the highest existing semver tag based on defaut
-	// regex or provided regex in "latestSemverRegex" config.
+	// select the highest existing semver tag based on defaut regex
+	// pattern or provided regex in "latestSemverRegex" config.
 	latestSemverTag, err := s.matchingLatestSemverTag(tags)
 	if err != nil {
 		return []string{}, err
