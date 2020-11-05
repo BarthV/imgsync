@@ -32,19 +32,20 @@ func initLogger(stringLevel string) {
 // NewDefaultCommand creates the default command.
 func NewDefaultCommand() *cobra.Command {
 	cmd := cobra.Command{
-		Use:   path.Base(os.Args[0]),
-		Short: "imgsync",
-		Long:  "Sync container images to a target registry based on multiple selectors and filters",
+		Use:          path.Base(os.Args[0]),
+		Short:        "imgsync",
+		Long:         "Sync container images to a target registry based on multiple selectors and filters",
+		SilenceUsage: true,
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			stringLevel := viper.GetString("loglevel")
 			initLogger(stringLevel)
 		},
 	}
 
-	cmd.PersistentFlags().StringP("confpath", "c", "", "Dir or complete path of the config file (defaults to .imgsync.yaml)")
+	cmd.PersistentFlags().StringP("confpath", "c", ".imgsync.yaml", "Dir (or complete yaml filepath) of the config file")
 	viper.BindPFlag("confpath", cmd.PersistentFlags().Lookup("confpath"))
 
-	cmd.PersistentFlags().StringP("loglevel", "l", log.InfoLevel.String(), "Log verbosity (defaults to info)")
+	cmd.PersistentFlags().StringP("loglevel", "l", log.InfoLevel.String(), "Log verbosity")
 	viper.BindPFlag("loglevel", cmd.PersistentFlags().Lookup("loglevel"))
 
 	viper.SetEnvPrefix("IMGSYNC")

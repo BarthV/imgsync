@@ -16,8 +16,13 @@ const (
 
 // Config contains sources and target definition for imgsync job.
 type Config struct {
-	Target  Repo     `yaml:"target"`
-	Sources []Source `yaml:"sources,omitempty"`
+	Target              Repo     `yaml:"target"`
+	Sources             []Source `yaml:"sources,omitempty"`
+	ContinueOnSyncError bool     `yaml:"continueOnSyncError,omitempty"`
+	// ListTimeout          string   `yaml:"listTimeout,omitempty"`
+	// SyncTimeout          string   `yaml:"syncTimeout,omitempty"`
+	// DeleteUnmanagedTags  bool     `yaml:"deleteUnmanagedTags,omitempty"`
+	// DeleteUnmanagedRepos bool     `yaml:"deleteUnmanagedRepos,omitempty"`
 }
 
 // Auth is a username and password to authenticate to a registry.
@@ -33,10 +38,11 @@ type Repo struct {
 	Scheme     string `yaml:"scheme:omitempty"`
 	Host       string `yaml:"host,omitempty"`
 	Auth       Auth   `yaml:"auth,omitempty"`
+	// AllowInsecure bool `yaml:"allowInsecure,omitempty"`
 }
 
-// Source is a container repo in the manifest. Synced tags can be
-// selected with multiple options and strategies
+// Source is a container registry where tags will be pulled from.
+// Images can be selected with multiple options and strategies.
 type Source struct {
 	Source             Repo     `yaml:"source"`
 	Tags               []string `yaml:"tags,omitempty"`

@@ -55,7 +55,7 @@ func (s *Source) matchingRegexTags(tags []string) ([]string, error) {
 
 			match, err := regexp.MatchString(r, t)
 			if err != nil {
-				return []string{}, fmt.Errorf("Matching regexp \"%s\" %w", r, err)
+				return []string{}, fmt.Errorf("Matching regex \"%s\" %w", r, err)
 			}
 
 			if match {
@@ -99,7 +99,7 @@ func getSemverTags(tags []string, regex string) ([]string, error) {
 	for _, t := range tags {
 		match, err := regexp.MatchString(regex, t)
 		if err != nil {
-			return []string{}, fmt.Errorf("Matching semver regexp %w", err)
+			return []string{}, fmt.Errorf("Matching semver regex %w", err)
 		}
 		if match {
 			semverTags = append(semverTags, t)

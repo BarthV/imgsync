@@ -1,12 +1,12 @@
 ---
 # listTimeout: 20s
 # syncTagTimeout: 240s
-# continueOnSyncError: false
+# continueOnSyncError: true
+# deleteUnmanagedTags: true
+# deleteUnmanagedRepos: true
 target:
   # repository: test
   host: 127.0.0.1:5000
-  # deleteUnmanagedTags: true
-  # deleteUnmanagedImages: true
 sources:
 - source:
     repository: barthv/coreos-flannel-multiarch

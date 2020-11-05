@@ -78,6 +78,9 @@ func TestMatchingRegexTags(t *testing.T) {
 			if err != nil && !test.wantError {
 				t.Errorf("got unexpected error %v", err)
 			}
+			if err == nil && test.wantError {
+				t.Errorf("Error is expected, func returned nil")
+			}
 			if !reflect.DeepEqual(ans, test.want) {
 				t.Errorf("got '%s', want '%s'", ans, test.want)
 			}
@@ -95,8 +98,12 @@ func TestGetHighestSemverTag(t *testing.T) {
 		{[]string{}, "", false},
 		{[]string{""}, "", false},
 		{[]string{"1.0.0", "2.0.1", "1.1.0"}, "2.0.1", false},
-		{[]string{"v1.0.1"}, "1.0.1", true},
+		{[]string{"v1.0.1"}, "1.0.1", false},
 		{[]string{"1.32-glibc", "1.32-musl", "1.32-uclibc", "1.32.0-glibc", "1.32.0-musl", "1.32.0-uclibc", "1.32.0", "1.32", "1"}, "1.32.0", false},
+		{[]string{"1", "1.0", "1.0.0"}, "1.0.0", false},
+		{[]string{"1", "1.2", "1.2.3"}, "1.2.3", false},
+		{[]string{"this-is-not-semver"}, "", true},
+		{[]string{"1.2.3.4"}, "", true},
 	}
 
 	for _, test := range tests {
@@ -105,6 +112,9 @@ func TestGetHighestSemverTag(t *testing.T) {
 			ans, err := getHighestSemverTag(test.semvers)
 			if err != nil && !test.wantError {
 				t.Errorf("got unexpected error %v", err)
+			}
+			if err == nil && test.wantError {
+				t.Errorf("Error is expected, func returned nil")
 			}
 			if !reflect.DeepEqual(ans, test.want) {
 				t.Errorf("got '%s', want '%s'", ans, test.want)
